@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
  ┌────────────────────────────────────────────────────────────┐
  |  For More Modules Or Updates Stay Connected to Kodi dot AL |
@@ -31,41 +31,37 @@ THE STRUCTURE IS ONLY TO GET HLS/M3U8 STREAMS
 ob_start();
 error_reporting(0);
 set_time_limit(0);
-
 date_default_timezone_set("Europe/Tirane");
+
+$Stream_Provider = "Albdroid TV";
+$Stream_Type = "Streaming";
+$Stream_Types = " Live Stream";
 
 // FULL PANEL HOST URL http://localhost/rest-api/v100/all_tv_channel/?API-KEY=04453d46be88997
 // START YOUR SETTINGS
-$main_panel_url = "http://localhost/"; // PANEL HOST URL
+$main_panel_url = "http://localhost/"; // PANEL HOST URL 'WITH OR WITHOUT / TO END'
 $api_path = "rest-api/v100"; // DO NOT TOUCH IT
 $api_key_attributes = "?API-KEY="; // DO NOT TOUCH IT
 $api_key = "04453d46be88997"; // API KEY FROM admin/api_setting/
 // END YOUR SETTINGS
 $get_parameter = "all_tv_channel";
 $slash = "/";
-$api_call_all_parameters = $main_panel_url.$api_path.$slash.$get_parameter.$slash.$api_key_attributes.$api_key;
+$api_call_all_parameters = $main_panel_url.$slash.$api_path.$slash.$get_parameter.$slash.$api_key_attributes.$api_key;
 //echo $api_call_all_parameters;
 
-$Stream_Provider = "Albdroid TV";
-$Stream_Type = "Streaming";
-$Stream_Types = " Live Stream";
-$albdroidlogo = "https://png.kodi.al/tv/albdroid/"; // black.png  Albdroidtv.png  albdroid.png  albdroidflat.png
-
-// DATA - VITI - ORA
-$zone = "Europe/Tirane";
-$data1 = date("l d/m/Y - H:i:s");
-$data2 = date("l, d F Y - H:i:s");
-$data3 = date("d F Y");
-$viti = date("Y");
 $get_all_tv_channels  = file_get_contents($api_call_all_parameters);
 $json_tv_channels  = json_decode($get_all_tv_channels);
-
-echo("#EXTM3U Albdroid TV Streaming # $Stream_Type ($data2)\n");
+if (is_null($json_tv_channels))
+{
+echo "Check Your Settings From [START YOUR SETTINGS to END YOUR SETTINGS]";
+}
+else
+{
+echo("#EXTM3U Albdroid TV Streaming"."\n");
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json');
 foreach($json_tv_channels as $item)
 {
-
 if ($item->{'stream_from'}=='hls')
 {
 $title = $item->tv_name;
@@ -81,6 +77,7 @@ $grouptitle = "$Stream_Provider $Stream_Type";
 $group_title = ('group-title="'. $grouptitle .'"');
 echo "\r#EXTINF:-1 $tvg_id $tvg_name $tvg_logo $group_title,$title\n";
 echo $stream_url."\n";
+}
 }
 }
 ob_end_flush();
